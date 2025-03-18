@@ -1,7 +1,7 @@
 // controllers/itemController.js
 const Item = require('../models/Item');
 
-// Create a new item (already exists)
+// Create a new item
 exports.createItem = async (req, res) => {
   try {
     const { name, description, price, category, quantity, inStock } = req.body;
@@ -19,7 +19,7 @@ exports.createItem = async (req, res) => {
   }
 };
 
-// Retrieve all items (already exists)
+// Retrieve all items
 exports.getItems = async (req, res) => {
   try {
     const items = await Item.find();
@@ -31,18 +31,17 @@ exports.getItems = async (req, res) => {
 
 // Retrieve a single item by its ID
 exports.getItemById = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const item = await Item.findById(id);
-      if (!item) {
-        return res.status(404).json({ message: 'Item not found.' });
-      }
-      res.status(200).json(item);
-    } catch (error) {
-      res.status(500).json({ message: 'Server Error', error });
+  try {
+    const { id } = req.params;
+    const item = await Item.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found.' });
     }
-  };
-  
+    res.status(200).json(item);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};
 
 // Update an item
 exports.updateItem = async (req, res) => {
@@ -50,12 +49,10 @@ exports.updateItem = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    // Basic validation: Ensure at least one field is provided to update
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: 'No update data provided.' });
     }
 
-    // Validate if the ID exists in our collection
     const updatedItem = await Item.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
     if (!updatedItem) {
       return res.status(404).json({ message: 'Item not found.' });
@@ -79,4 +76,3 @@ exports.deleteItem = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error });
   }
 };
-
