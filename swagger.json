@@ -1,0 +1,211 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "My CRUD API",
+      "version": "1.0.0",
+      "description": "A simple CRUD API for Items and Users."
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ],
+    "paths": {
+      "/api/items": {
+        "get": {
+          "summary": "Retrieve all items",
+          "responses": {
+            "200": { "description": "A list of items" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "post": {
+          "summary": "Create a new item",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Item"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Item created" },
+            "400": { "description": "Bad Request" },
+            "500": { "description": "Server error" }
+          }
+        }
+      },
+      "/api/items/{id}": {
+        "get": {
+          "summary": "Retrieve a single item by ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "Item found" },
+            "404": { "description": "Item not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "put": {
+          "summary": "Update an item",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Item" }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Item updated" },
+            "400": { "description": "No update data provided or invalid data" },
+            "404": { "description": "Item not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "delete": {
+          "summary": "Delete an item",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "Item deleted successfully" },
+            "404": { "description": "Item not found" },
+            "500": { "description": "Server error" }
+          }
+        }
+      },
+      "/api/users": {
+        "get": {
+          "summary": "Retrieve all users",
+          "responses": {
+            "200": { "description": "A list of users" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "post": {
+          "summary": "Create a new user",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "User created" },
+            "400": { "description": "Bad Request" },
+            "500": { "description": "Server error" }
+          }
+        }
+      },
+      "/api/users/{id}": {
+        "get": {
+          "summary": "Retrieve a single user by ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "User found" },
+            "404": { "description": "User not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "put": {
+          "summary": "Update a user",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "User updated" },
+            "400": { "description": "No update data provided or invalid data" },
+            "404": { "description": "User not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "delete": {
+          "summary": "Delete a user",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "User deleted successfully" },
+            "404": { "description": "User not found" },
+            "500": { "description": "Server error" }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Item": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "description": { "type": "string" },
+            "price": { "type": "number" },
+            "category": { "type": "string" },
+            "quantity": { "type": "number" },
+            "inStock": { "type": "boolean" }
+          },
+          "required": ["name", "description", "price", "category", "quantity", "inStock"]
+        },
+        "User": {
+          "type": "object",
+          "properties": {
+            "username": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "password": { "type": "string" }
+          },
+          "required": ["username", "email", "password"]
+        }
+      }
+    }
+  }
+  
