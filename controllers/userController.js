@@ -1,25 +1,8 @@
-// controllers/userController.js
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
-// Create a new user
-exports.createUser = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-
-    // Validation: Ensure required fields are provided
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Username, email, and password are required.' });
-    }
-
-    const newUser = new User({ username, email, password });
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error', error });
-  }
-};
-
-// Retrieve all users
+// Get all users (protected)
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -29,7 +12,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-// Retrieve a single user by ID
+// Get a single user by ID (protected)
 exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +26,26 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Update a user
+// Create a new user (registration)
+exports.createUser = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Validate input
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Username, email, and password are required.' });
+    }
+
+    // Create and save the new user (password hashing will occur in the User model pre-save hook)
+    const newUser = new User({ username, email, password });
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};
+
+// Update an existing user (protected)
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,7 +65,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete a user
+// Delete a user (protected)
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,6 +74,41 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
     res.status(200).json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};
+
+// Login user and return JWT token
+exports.loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.' });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials.' });
+    }
+
+    // Compare password using bcrypt
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials.' });
+    }
+
+    // Sign a JWT token; secret should be stored securely (e.g., in your .env)
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || 'yoursecretkey',
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({ token, message: 'Login successful.' });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }
